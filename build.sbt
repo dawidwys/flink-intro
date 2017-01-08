@@ -26,6 +26,13 @@ lazy val flinkEventGenerator = (project in file("flink-event-generator"))
   .settings(ownSettings)
   .settings(libraryDependencies ++= (flinkDependencies ++ flinkKafkaDependencies))
 
+lazy val flinkCep = (project in file("flink-cep"))
+  .dependsOn(flinkIntroModel)
+  .settings(commonSettings)
+  .settings(ownSettings)
+  .settings(
+    libraryDependencies ++= (flinkDependencies ++ flinkKafkaDependencies ++ flinkCepDependencies))
+
 lazy val flinkQueryableJob = (project in file("flink-queryable-job"))
   .dependsOn(flinkIntroModel)
   .settings(commonSettings)
@@ -51,13 +58,18 @@ lazy val mainRunnerFlinkQueryableJob = project.in(file("flink-queryable-job/main
   .settings(commonSettings)
   .settings(changeProvided(flinkQueryableJob))
 
+lazy val mainRunnerFlinkCep = project.in(file("flink-cep/mainRunner"))
+  .dependsOn(flinkCep)
+  .settings(commonSettings)
+  .settings(changeProvided(flinkCep))
+
 lazy val mainRunnerFlinkStateServer = project.in(file("flink-state-server/mainRunner"))
   .dependsOn(flinkStateServer)
   .settings(commonSettings)
   .settings(changeProvided(flinkStateServer))
 
 lazy val root = project.in(file("."))
-  .aggregate(flinkEventGenerator, flinkQueryableJob, flinkStateServer)
+  .aggregate(flinkEventGenerator, flinkQueryableJob, flinkStateServer, flinkCep)
 
 resolvers in ThisBuild ++= Seq(
   "Apache Development Snapshot Repository" at

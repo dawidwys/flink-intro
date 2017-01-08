@@ -14,4 +14,8 @@ object FlinkDependencies {
     "org.apache.flink" %% "flink-connector-kafka-0.10" % flinkVersions.mainVersion
   )
 
+  val flinkCepDependencies = Seq(
+    "org.apache.flink" %% "flink-cep-scala" % flinkVersions.mainVersion
+  )
+
 }

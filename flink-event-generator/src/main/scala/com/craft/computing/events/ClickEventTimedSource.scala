@@ -24,10 +24,14 @@ import org.apache.flink.streaming.api.functions.source.RichParallelSourceFunctio
 import org.apache.flink.streaming.api.functions.source.SourceFunction.SourceContext
 import org.apache.flink.streaming.api.watermark.Watermark
 
+import scala.util.Random
+
 class ClickEventTimedSource extends RichParallelSourceFunction[ClickEvent] {
 
   @volatile private var running = true
-  private val maxInterval = 1000
+  private val maxInterval = 4000
+
+  private val users = (1 to 10).map(_ => UUID.randomUUID())
 
   override def cancel(): Unit = {
     running = false
@@ -43,11 +47,12 @@ class ClickEventTimedSource extends RichParallelSourceFunction[ClickEvent] {
   }
 
   private def generateEvent(now: Long): ClickEvent = {
+    val user = users(Random.nextInt(users.size))
     Math.random() match {
-      case x if x > 0.9 => LoginClickEvent(UUID.randomUUID(), now)
-      case x if x > 0.8 => LogoutClickEvent(UUID.randomUUID(), now)
-      case x if x > 0.5 => ButtonClickEvent(UUID.randomUUID(), Element.AddCredit, now)
-      case _ => ButtonClickEvent(UUID.randomUUID(), Element.RequestCard, now)
+      case x if x > 0.9 => LoginClickEvent(user, now)
+      case x if x > 0.8 => LogoutClickEvent(user, now)
+      case x if x > 0.5 => ButtonClickEvent(user, Element.AddCredit, now)
+      case _ => ButtonClickEvent(user, Element.RequestCard, now)
     }
   }
 }

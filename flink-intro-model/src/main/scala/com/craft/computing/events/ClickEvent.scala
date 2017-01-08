@@ -23,6 +23,7 @@ import com.craft.computing.events.Element.Element
 
 sealed trait ClickEvent {
   def timestamp : Long
+  def userId : UUID
 }
 
 final case class LogoutClickEvent(userId: UUID, timestamp: Long) extends ClickEvent
