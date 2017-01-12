@@ -1,4 +1,4 @@
-package com.dataartisans.stateserver.queryclient
+package com.craft.computing.stateserver.queryclient
 
 import java.{lang, util}
 
@@ -14,12 +14,11 @@ import org.apache.flink.runtime.state.{VoidNamespace, VoidNamespaceSerializer}
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{Await, duration}
 
-class QueryClient {
+class QueryClient(val jobID: String) {
   private val client = getQueryableStateClient()
-  private val JobId: String = "f83efc0b6f7e9dccf9565bcc7f526bdf"
 
   def executeQuery(key: String): util.List[KeyedDataPoint[lang.Integer]] = {
-    val jobId = JobID.fromHexString(JobId)
+    val jobId = JobID.fromHexString(jobID)
 
     // Serialize request
     val seralizedKey = getSeralizedKey(key)
@@ -41,7 +40,7 @@ class QueryClient {
 
   private def deserializeResponse(serializedResult: Array[Byte]): util.List[KeyedDataPoint[lang
   .Integer]] = {
-    KvStateRequestSerializer.deserializeList(serializedResult, getValueSerializer())
+    KvStateRequestSerializer.deserializeList(serializedResult, valueSerializer)
   }
 
   private def getQueryableStateClient(): QueryableStateClient = {
@@ -52,7 +51,7 @@ class QueryClient {
     client
   }
 
-  private def getValueSerializer(): TypeSerializer[KeyedDataPoint[java.lang.Integer]] = {
+  private val valueSerializer: TypeSerializer[KeyedDataPoint[java.lang.Integer]] = {
     TypeInformation.of(new TypeHint[KeyedDataPoint[lang.Integer]]() {})
       .createSerializer(new ExecutionConfig)
   }
@@ -72,7 +71,7 @@ class QueryClient {
 
 object QueryClient {
 
-  def apply(): QueryClient = {
-    new QueryClient
+  def apply(jobID: String): QueryClient = {
+    new QueryClient(jobID)
   }
 }
