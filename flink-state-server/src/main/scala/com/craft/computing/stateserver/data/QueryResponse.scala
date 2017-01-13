@@ -1,4 +1,4 @@
-package com.dataartisans.stateserver.data
+package com.craft.computing.stateserver.data
 
 //[
 //  {

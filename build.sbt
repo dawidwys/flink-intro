@@ -18,6 +18,7 @@ lazy val flinkIntroModel = (project in file("flink-intro-model"))
 lazy val flinkStateServer = (project in file("flink-state-server"))
   .dependsOn(flinkIntroModel)
   .settings(commonSettings)
+  .settings(ownSettings)
   .settings(libraryDependencies ++= flinkDependencies)
 
 lazy val flinkEventGenerator = (project in file("flink-event-generator"))

@@ -1,0 +1,9 @@
+{
+     "format" : "json",
+     "targets":  [{"target": "piper", "refId": "A"}],
+     "panelId": 1.0,
+     "interval": "10s",
+     "range": {"from": "2015-12-22T03:00:00.000Z", "to" : "2015-12-22T07:00:00.000Z"},
+     "maxDataPoints": 1440.0,
+     "rangeRaw": {"from":  "2015-12-22T03:00:00.000Z", "to": "2015-12-22T07:00:00.000Z"}
+}
