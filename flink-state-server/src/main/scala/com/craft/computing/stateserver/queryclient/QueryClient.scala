@@ -40,7 +40,7 @@ class QueryClient(val jobID: String) {
 
   private def deserializeResponse(serializedResult: Array[Byte]): util.List[KeyedDataPoint[lang
   .Integer]] = {
-    KvStateRequestSerializer.deserializeList(serializedResult, valueSerializer)
+    KvStateRequestSerializer.deserializeValue(serializedResult, valueSerializer)
   }
 
   private def getQueryableStateClient(): QueryableStateClient = {
@@ -51,8 +51,8 @@ class QueryClient(val jobID: String) {
     client
   }
 
-  private val valueSerializer: TypeSerializer[KeyedDataPoint[java.lang.Integer]] = {
-    TypeInformation.of(new TypeHint[KeyedDataPoint[lang.Integer]]() {})
+  private val valueSerializer: TypeSerializer[util.ArrayList[KeyedDataPoint[java.lang.Integer]]] = {
+    TypeInformation.of(new TypeHint[util.ArrayList[KeyedDataPoint[lang.Integer]]]() {})
       .createSerializer(new ExecutionConfig)
   }
 

@@ -34,6 +34,13 @@ lazy val flinkCep = (project in file("flink-cep"))
   .settings(
     libraryDependencies ++= (flinkDependencies ++ flinkKafkaDependencies ++ flinkCepDependencies))
 
+lazy val flinkSql = (project in file("flink-sql"))
+  .dependsOn(flinkIntroModel)
+  .settings(commonSettings)
+  .settings(ownSettings)
+  .settings(
+    libraryDependencies ++= (flinkDependencies ++ flinkKafkaDependencies ++ flinkSqlDependencies))
+
 lazy val flinkQueryableJob = (project in file("flink-queryable-job"))
   .dependsOn(flinkIntroModel)
   .settings(commonSettings)
@@ -63,6 +70,11 @@ lazy val mainRunnerFlinkCep = project.in(file("flink-cep/mainRunner"))
   .dependsOn(flinkCep)
   .settings(commonSettings)
   .settings(changeProvided(flinkCep))
+
+lazy val mainRunnerFlinkSql = project.in(file("flink-sql/mainRunner"))
+  .dependsOn(flinkSql)
+  .settings(commonSettings)
+  .settings(changeProvided(flinkSql))
 
 lazy val mainRunnerFlinkStateServer = project.in(file("flink-state-server/mainRunner"))
   .dependsOn(flinkStateServer)
