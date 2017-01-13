@@ -69,7 +69,6 @@ object QueryableJob {
         override def extractAscendingTimestamp(element: ClickEvent) = element.timestamp
       })
 
-    type CountEvent = (String, Int, Long)
     env.addSource(kafkaConsumer).map(
       e => e match {
         case LoginClickEvent(_, t) => ("login", 1, t)

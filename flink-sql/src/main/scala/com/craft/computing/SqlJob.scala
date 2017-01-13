@@ -55,8 +55,8 @@ object SqlJob {
 
     val conf = new Conf(args)
     val env = StreamExecutionEnvironment.getExecutionEnvironment
-    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
     val tableEnv = TableEnvironment.getTableEnvironment(env)
+    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
 
     val deserializationSchema = new TypeInformationSerializationSchema(
       TypeInformation
@@ -84,10 +84,10 @@ object SqlJob {
 
     tableEnv.registerDataStream("events", eventStream)
 
-//    eventStream.toTable(tableEnv).where('elem === "AddCredit")
-//      .toDataStream[QueryableButtonClickEvent].print()
+    eventStream.toTable(tableEnv).where('elem === "AddCredit")
+      .toDataStream[QueryableButtonClickEvent].print()
 
-    tableEnv.sql("select * from events where elem IS NOT NULL")
+    tableEnv.sql("select * from events where elem = 'AddCredit'")
       .toDataStream[QueryableButtonClickEvent].print()
 
     env.execute("Sql job")
