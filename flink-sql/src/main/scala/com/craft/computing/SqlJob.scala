@@ -20,19 +20,21 @@ package com.craft.computing
 
 import java.util.Properties
 
-import com.craft.computing.events.{ButtonClickEvent, ClickEvent, LoginClickEvent, LogoutClickEvent}
-import com.craft.computing.functions.QueryableStateMapFunction
-import com.jgrier.flinkstuff.data.KeyedDataPoint
+import com.craft.computing.events.{ButtonClickEvent, ClickEvent, Element}
 import org.apache.flink.api.common.typeinfo.{TypeHint, TypeInformation}
 import org.apache.flink.streaming.api.TimeCharacteristic
 import org.apache.flink.streaming.api.functions.timestamps.AscendingTimestampExtractor
-import org.apache.flink.streaming.api.scala._
-import org.apache.flink.streaming.api.windowing.time.Time
+import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer010
 import org.apache.flink.streaming.util.serialization.TypeInformationSerializationSchema
+import org.apache.flink.table.api.TableEnvironment
 import org.rogach.scallop.ScallopConf
+import org.apache.flink.api.scala._
+import org.apache.flink.table.api.scala._
 
-object QueryableJob {
+object SqlJob {
+
+  case class QueryableButtonClickEvent(uuid: String, elem: String, timestamp: Long)
 
   class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
     val kafkaBootstrap = opt[String](required = true, descr = "Kafka bootstrap server")
@@ -54,6 +56,7 @@ object QueryableJob {
     val conf = new Conf(args)
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
+    val tableEnv = TableEnvironment.getTableEnvironment(env)
 
     val deserializationSchema = new TypeInformationSerializationSchema(
       TypeInformation
@@ -69,19 +72,25 @@ object QueryableJob {
         override def extractAscendingTimestamp(element: ClickEvent) = element.timestamp
       })
 
-    type CountEvent = (String, Int, Long)
-    env.addSource(kafkaConsumer).map(
-      e => e match {
-        case LoginClickEvent(_, t) => ("login", 1, t)
-        case LogoutClickEvent(_, t) => ("logout", 1, t)
-        case ButtonClickEvent(_, _, t) => ("button", 1, t)
-      }).keyBy(0).timeWindow(Time.seconds(1))
-      .reduce((e1, e2) => (e1._1, e1._2 + e2._2, Math.max(e1._3, e2._3)))
-      .map(e => new KeyedDataPoint[java.lang.Integer](e._1, e._3, e._2))
-      .keyBy("key")
-      .flatMap(QueryableStateMapFunction())
+    val eventStream = env.addSource(kafkaConsumer).flatMap(
+      x => x match {
+        case t: ButtonClickEvent => Some(
+          QueryableButtonClickEvent(
+            t.userId.toString,
+            t.elem.toString,
+            t.timestamp))
+        case _ => None
+      })
 
-    env.execute("Queryable Job")
+    tableEnv.registerDataStream("events", eventStream)
+
+//    eventStream.toTable(tableEnv).where('elem === "AddCredit")
+//      .toDataStream[QueryableButtonClickEvent].print()
+
+    tableEnv.sql("select * from events where elem IS NOT NULL")
+      .toDataStream[QueryableButtonClickEvent].print()
+
+    env.execute("Sql job")
   }
 
 }

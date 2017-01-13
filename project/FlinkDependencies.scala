@@ -18,4 +18,8 @@ object FlinkDependencies {
     "org.apache.flink" %% "flink-cep-scala" % flinkVersions.mainVersion
   )
 
+  val flinkSqlDependencies = Seq(
+    "org.apache.flink" %% "flink-table" % flinkVersions.mainVersion
+  )
+
 }
