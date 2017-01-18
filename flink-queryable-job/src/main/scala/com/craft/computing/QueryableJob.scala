@@ -69,13 +69,12 @@ object QueryableJob {
         override def extractAscendingTimestamp(element: ClickEvent) = element.timestamp
       })
 
-    env.addSource(kafkaConsumer).map(
+    env.addSource(kafkaConsumer).name("Read events from Kafka").map(
       e => e match {
         case LoginClickEvent(_, t) => ("login", 1, t)
         case LogoutClickEvent(_, t) => ("logout", 1, t)
         case ButtonClickEvent(_, _, t) => ("button", 1, t)
-      }).keyBy(0).timeWindow(Time.seconds(1))
-      .reduce((e1, e2) => (e1._1, e1._2 + e2._2, Math.max(e1._3, e2._3)))
+      }).keyBy(0).reduce((e1, e2) => (e1._1, e1._2 + e2._2, Math.max(e1._3, e2._3)))
       .map(e => new KeyedDataPoint[java.lang.Integer](e._1, e._3, e._2))
       .keyBy("key")
       .flatMap(QueryableStateMapFunction())

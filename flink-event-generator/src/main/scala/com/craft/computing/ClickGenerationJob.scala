@@ -32,6 +32,7 @@ object ClickGenerationJob {
 
   class Conf(arguments: Seq[String]) extends ScallopConf(arguments) {
     val kafkaBootstrap = opt[String](required = true, descr = "Kafka bootstrap server")
+    val maxInterval = opt[Int](required = false, descr = "Max interval between events", default = Some(4000))
     val kafkaTopic = trailArg[String](
       descr = "Kafka topic to write to",
       default = Some("ClickStream"),
@@ -50,7 +51,7 @@ object ClickGenerationJob {
     val conf = new Conf(args)
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
-    val stream = env.addSource(new ClickEventTimedSource)
+    val stream = env.addSource(new ClickEventTimedSource(conf.maxInterval())).name("Event generator")
 
     val kafkaProducerConfig = FlinkKafkaProducer010.writeToKafkaWithTimestamps(
       stream.javaStream,
