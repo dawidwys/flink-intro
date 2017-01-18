@@ -23,8 +23,8 @@ object FlinkStateServerMain {
 
     val controller = new FlinkStateServerController(QueryClient(conf.jobId()))
 
-    val bindingFuture = Http().bindAndHandle(controller.route, "localhost", 8888)
-    println(s"Server online at http://localhost:8888/\nPress RETURN to stop...")
+    val bindingFuture = Http().bindAndHandle(controller.route, "0.0.0.0", 8888)
+    println(s"Server online at http://0.0.0.0:8888/\nPress RETURN to stop...")
     StdIn.readLine() // let it run until user presses return
     bindingFuture
       .flatMap(_.unbind()) // trigger unbinding from the port

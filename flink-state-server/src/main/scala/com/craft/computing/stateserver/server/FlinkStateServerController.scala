@@ -1,6 +1,6 @@
 package com.craft.computing.stateserver.server
 
-import java.time.{LocalDateTime, ZoneId}
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 import akka.http.scaladsl.server.Directives._
@@ -13,29 +13,32 @@ import scala.util.matching.Regex
 
 class FlinkStateServerController(queryClient: QueryClient) extends JsonSupport {
 
-  val route: Route = post {
-    path("search") {
-      complete(Seq("login", "logout", "button"))
-    }
-  } ~ post {
-    path("query") {
-      entity(as[Query]) { query =>
+  val route: Route =
+    pathSingleSlash {
+      complete("Hi hello!")
+    } ~ post {
+      path("search") {
+        complete(Seq("login", "logout", "button"))
+      }
+    } ~ post {
+      path("query") {
+        entity(as[Query]) { query =>
 
-        val startTimeMs = LocalDateTime.parse(query.range.from).atZone(ZoneId.systemDefault()).toInstant.toEpochMilli
-        val intervalMs = parseToMillis(query.interval)
+          val startTimeMs = Instant.parse(query.range.from).toEpochMilli
+          val intervalMs = parseToMillis(query.interval)
 
-        val response = query.targets.toArray.map {
-          queryTarget => {
-            QueryResponse(
-              target = queryTarget.target,
-              datapoints = queryFlink(queryTarget.target, startTimeMs, query.maxDataPoints.toLong, intervalMs)
-            )
+          val response = query.targets.toArray.map {
+            queryTarget => {
+              QueryResponse(
+                target = queryTarget.target,
+                datapoints = queryFlink(queryTarget.target, startTimeMs, query.maxDataPoints.toLong, intervalMs)
+              )
+            }
           }
+          complete(response)
         }
-        complete(response)
       }
     }
-  }
 
   def queryFlink(key: String, startTime: Long, numPoints: Long, interval: Long): Array[Array[Long]] = {
     val results = queryClient.executeQuery(key).asScala.toArray

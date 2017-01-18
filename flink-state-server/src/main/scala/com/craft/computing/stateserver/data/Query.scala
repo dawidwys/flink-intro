@@ -14,7 +14,7 @@ case class QueryRange(from: String, to: String)
 case class QueryTarget(refId: String, target: String)
 
 case class Query(
-  panelId: String,
+  panelId: Int,
   range: QueryRange,
   rangeRaw: QueryRange,
   interval: String,
