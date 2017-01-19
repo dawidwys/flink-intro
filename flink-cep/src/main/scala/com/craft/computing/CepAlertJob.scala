@@ -20,7 +20,7 @@ package com.craft.computing
 
 import java.util.Properties
 
-import com.craft.computing.events.{ButtonClickEvent, ClickEvent, Element, LoginClickEvent}
+import com.craft.computing.events._
 import org.apache.flink.api.common.typeinfo.{TypeHint, TypeInformation}
 import org.apache.flink.cep.scala.CEP
 import org.apache.flink.cep.scala.pattern.Pattern
@@ -72,7 +72,7 @@ object CepAlertJob {
     val eventStream = env.addSource(kafkaConsumer).map(e => (e.userId, e)).keyBy(0).map(_._2)
 
     val shortSessionPattern = Pattern.begin[ClickEvent]("login")
-      .subtype(classOf[LoginClickEvent]).followedBy("logout").within(Time.seconds(5))
+      .subtype(classOf[LoginClickEvent]).followedBy("logout").subtype(classOf[LogoutClickEvent]).within(Time.seconds(5))
 
     val creditCardRequest = Pattern.begin[ClickEvent]("credit")
       .subtype(classOf[ButtonClickEvent]).where(_.elem == Element.AddCredit)
