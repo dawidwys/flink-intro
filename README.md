@@ -4,13 +4,14 @@
 
 ### Prerequisites
 
-[docker](https://www.docker.com/products/overview) >= 1.12.5(tested) 
+[docker](https://www.docker.com/products/overview) >= 1.12.5(tested)
+
 [docker-compose](https://docs.docker.com/compose/install/) >= 1.10
 
 ### Flink docker image
 
 This code requires Flink version 1.2-SNAPSHOT (as of 19.01). To build flink docker image one has to build flink binary version oneself.
-To do that checkout [flink](https://github.com/apache/flink/tree/release-1.2) and follow instructions in official dosc to build it.
+To do that checkout [flink](https://github.com/apache/flink/tree/release-1.2) and follow instructions in official docs to build it.
 Than copy `${FLINK_DIR}/flink-dist/target/flink-1.2-SNAPSHOT-bin/flink-1.2-SNAPSHOT` into `${FLINK_INTRO_DIR}/infrastructure/flink/archive`.
 
 Than inside `${FLINK_INTRO_DIR}/infrastructure/flink` run:
