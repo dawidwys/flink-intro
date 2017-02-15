@@ -2,7 +2,7 @@ import sbt._
 
 object FlinkDependencies {
   val flinkVersions = new{
-    val mainVersion = "1.2-SNAPSHOT"
+    val mainVersion = "1.2.0"
   }
 
   val flinkDependencies = Seq(
